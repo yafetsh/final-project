@@ -62,44 +62,6 @@ public void getAllDepartementsNamesByEntrepriseTest()
 	
 }
 
-@Test
-public void deleteEntrepriseByIdTest() 
-{
-	
-	Entreprise e = new Entreprise("Entreprise", "Entreprise3"); 
-	int er = ies.ajouterEntreprise(e); 
-	ies.deleteEntrepriseById(er);  	
-	
-	Entreprise erd=	ies.getEntrepriseById(er);  	
-
-    assertNotNull(erd);
-
-	
-	
-}
-
-@Test
-public void deleteDepartementByIdTest()
-{
-	
-	Entreprise e = new Entreprise("Entreprise", "Entreprise4"); 
-	Departement d = new Departement("Departement4"); 
-	int er = ies.ajouterEntreprise(e); 
-	e.setId(er);
-	d.setEntreprise(e);
-	int dr = ies.ajouterDepartement(d); 
-    ies.affecterDepartementAEntreprise(dr,er); 
-    
-	ies.deleteDepartementById(dr);  	
-
-	List<String> listDeparts = ies.getAllDepartementsNamesByEntreprise(er); 
-
-	assertEquals(0, listDeparts.size()	);
-
-	
-	
-	
-}
 
 @Test
 public void getEntrepriseByIdTest()
