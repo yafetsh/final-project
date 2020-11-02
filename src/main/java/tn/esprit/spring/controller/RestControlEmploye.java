@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import tn.esprit.spring.dto.ContratDto;
+import tn.esprit.spring.dto.EmployeDto;
 import tn.esprit.spring.entities.Contrat;
 import tn.esprit.spring.entities.Employe;
 import tn.esprit.spring.entities.Entreprise;
@@ -22,6 +24,7 @@ import tn.esprit.spring.entities.Timesheet;
 import tn.esprit.spring.services.IEmployeService;
 import tn.esprit.spring.services.IEntrepriseService;
 import tn.esprit.spring.services.ITimesheetService;
+
 
 @RestController
 public class RestControlEmploye {
@@ -35,14 +38,18 @@ public class RestControlEmploye {
 	ITimesheetService itimesheetservice;
 
 	
+
+	
 	// http://localhost:8081/SpringMVC/servlet/ajouterEmployer
 	
 	@PostMapping("/ajouterEmployer")
 	@ResponseBody
-	public Employe ajouterEmploye(@RequestBody Employe employe)
+	public Employe ajouterEmploye(@RequestBody EmployeDto employe)
 	{
-		iemployeservice.ajouterEmploye(employe);
-		return employe;
+		Employe persistentEmploye  = new Employe(employe.getNom(),employe.getPrenom(),employe.getEmail(),employe.isActif(),employe.getRole());
+
+		iemployeservice.ajouterEmploye(persistentEmploye);
+		return persistentEmploye;
 	}
 	
 	// Modifier email : http://localhost:8081/SpringMVC/servlet/modifyEmail/1/newemail
@@ -69,8 +76,10 @@ public class RestControlEmploye {
 	// http://localhost:8081/SpringMVC/servlet/ajouterContrat
 	@PostMapping("/ajouterContrat")
 	@ResponseBody
-	public int ajouterContrat(@RequestBody Contrat contrat) {
-		iemployeservice.ajouterContrat(contrat);
+	public int ajouterContrat(@RequestBody ContratDto contrat) {
+		Contrat persistentContrat  = new Contrat(contrat.getDateDebut(),contrat.getTypeContrat(),contrat.getSalaire());
+
+		iemployeservice.ajouterContrat(persistentContrat);
 		return contrat.getReference();
 	}
 	
