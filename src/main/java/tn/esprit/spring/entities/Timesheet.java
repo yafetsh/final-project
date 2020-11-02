@@ -26,7 +26,7 @@ public class Timesheet implements Serializable{
     @JoinColumn(name = "idEmploye", referencedColumnName = "id", insertable=false, updatable=false)
 	private Employe employe;
 	
-	
+
 	private boolean isValide;
 	
 
