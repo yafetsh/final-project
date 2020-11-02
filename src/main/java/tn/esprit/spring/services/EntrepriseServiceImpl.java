@@ -2,19 +2,22 @@ package tn.esprit.spring.services;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import tn.esprit.spring.entities.Departement;
+import tn.esprit.spring.entities.Employe;
 import tn.esprit.spring.entities.Entreprise;
 import tn.esprit.spring.repository.DepartementRepository;
 import tn.esprit.spring.repository.EntrepriseRepository;
 
 @Service
 public class EntrepriseServiceImpl implements IEntrepriseService {
+	public final static Logger logger=LogManager.getLogger(EntrepriseServiceImpl.class);
 
 	@Autowired
     EntrepriseRepository entrepriseRepoistory;
@@ -22,12 +25,19 @@ public class EntrepriseServiceImpl implements IEntrepriseService {
 	DepartementRepository deptRepoistory;
 	
 	public int ajouterEntreprise(Entreprise entreprise) {
+		logger.info("adding Entreprise...");
 		entrepriseRepoistory.save(entreprise);
+		logger.info("Entreprise added!");
+
 		return entreprise.getId();
 	}
 
 	public int ajouterDepartement(Departement dep) {
+		logger.info("adding Departement...");
+
 		deptRepoistory.save(dep);
+		logger.info("Departement added!");
+
 		return dep.getId();
 	}
 	
@@ -37,59 +47,55 @@ public class EntrepriseServiceImpl implements IEntrepriseService {
 				// ==> c'est l'objet departement(le master) qui va mettre a jour l'association
 				//Rappel : la classe qui contient mappedBy represente le bout Slave
 				//Rappel : Dans une relation oneToMany le mappedBy doit etre du cote one.
-		Optional<Entreprise> entrepriseManagedEntity = entrepriseRepoistory.findById(entrepriseId);
-		Optional<Departement> depManagedEntity = deptRepoistory.findById(depId);
+				logger.info("affecting Departement...");
 
-				if(depManagedEntity.isPresent() && entrepriseManagedEntity.isPresent()){
-					depManagedEntity.get().setEntreprise(entrepriseManagedEntity.get());
-					deptRepoistory.save(depManagedEntity.get());
-				}
+				Entreprise entrepriseManagedEntity = entrepriseRepoistory.findById(entrepriseId).get();
+				Departement depManagedEntity = deptRepoistory.findById(depId).get();
 				
+				depManagedEntity.setEntreprise(entrepriseManagedEntity);
+				deptRepoistory.save(depManagedEntity);
+				
+				logger.info("Departement affected!");
+
 		
 	}
 	
 	public List<String> getAllDepartementsNamesByEntreprise(int entrepriseId) {
-		Optional<Entreprise> entrepriseManagedEntity = entrepriseRepoistory.findById(entrepriseId);
+		logger.info("getting Departements...");
 
+		Entreprise entrepriseManagedEntity = entrepriseRepoistory.findById(entrepriseId).get();
 		List<String> depNames = new ArrayList<>();
-		if(entrepriseManagedEntity.isPresent()){
-			for(Departement dep : entrepriseManagedEntity.get().getDepartements()){
-				depNames.add(dep.getName());
-			}
+		for(Departement dep : entrepriseManagedEntity.getDepartements()){
+			depNames.add(dep.getName());
 		}
-	
-		
+		logger.debug("Departemens: "+depNames);
+
 		return depNames;
 	}
 
 	@Transactional
 	public void deleteEntrepriseById(int entrepriseId) {
-		Optional<Entreprise> entrepriseManagedEntity = entrepriseRepoistory.findById(entrepriseId);
-if(entrepriseManagedEntity.isPresent()){
-	entrepriseRepoistory.delete(entrepriseManagedEntity.get());	
+		logger.warn("Deleting entreprise..action cannot be reversed!");
 
-}
+		entrepriseRepoistory.delete(entrepriseRepoistory.findById(entrepriseId).get());	
+		logger.info("Entreprise deleted!");
+
 	}
 
 	@Transactional
 	public void deleteDepartementById(int depId) {
-		Optional<Departement> depManagedEntity = deptRepoistory.findById(depId);
-if(depManagedEntity.isPresent()){
-	deptRepoistory.delete(depManagedEntity.get());	
+		logger.warn("Deleting departement..action cannot be reversed!");
 
-}
+		deptRepoistory.delete(deptRepoistory.findById(depId).get());	
+		logger.info("Departement deleted!");
+
 	}
 
 
 	public Entreprise getEntrepriseById(int entrepriseId) {
-		Optional<Entreprise> entrepriseManagedEntity = entrepriseRepoistory.findById(entrepriseId);
-if(entrepriseManagedEntity.isPresent()) {
-	return entrepriseManagedEntity.get();	
+		logger.info("retrieving entreprise...");
 
-}
-else {
-	return null;
-}
+		return entrepriseRepoistory.findById(entrepriseId).get();	
 	}
 
 }
