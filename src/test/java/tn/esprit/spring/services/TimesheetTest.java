@@ -45,7 +45,7 @@ public class TimesheetTest {
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 		 Date dd = dateFormat.parse("2015-03-23");
 		 Date dd2 = dateFormat.parse("2019-03-23");
-		 timesheetService.ajouterTimesheet(1, 1, dd, dd2);
+		 timesheetService.ajouterTimesheet(mission1.getId(), 1, dd, dd2);
 		 assertEquals(timesheetService.findAllMissionByEmployeJPQL(1), timesheetService.getAllEmployeByMission(1));
 
 		
