@@ -47,7 +47,7 @@ public class EmployeTest {
 	@Autowired
 	private TestEntityManager entityManager;
 	Employe employe = new Employe("test","test","test",true,Role.ADMINISTRATEUR);
-	Entreprise entreprise = new Entreprise ();
+	//Entreprise entreprise = new Entreprise ();
 	
 	
 	public void employeNamesTest() {
@@ -65,12 +65,7 @@ public class EmployeTest {
 	}
 	
 	
-	public void countempFailureTest() {
-        LOGGER.debug("counting employes failed  ");
-
-		assertNull(repo.countemp());
 	
-	}
 	
 	public void countempTest() {
         LOGGER.debug("counting employes in database ");
@@ -79,17 +74,13 @@ public class EmployeTest {
 	
 	}
 	
-	public void getAllEmployeByEntreprisecTest() {
-		entityManager.persist(entreprise);
-		assertNotNull(repo.getAllEmployeByEntreprisec(entreprise));
+	//public void getAllEmployeByEntreprisecTest() {
+		//entityManager.persist(entreprise);
+		//assertNotNull(repo.getAllEmployeByEntreprisec(entreprise));
 		
-	}
+	//}
 	
-	public void getAllEmployeByEntreprisecFailureTest() {
-		entityManager.persist(entreprise);
-		assertNull(repo.getAllEmployeByEntreprisec(entreprise));
-		
-	}
+	
 	public void getSalaireByEmployeIdJPQLTest() {
 		
 		assertNotNull(repo.getSalaireByEmployeIdJPQL(3));
@@ -98,12 +89,7 @@ public class EmployeTest {
 	}
 	
 	
-	public void getSalaireByEmployeIdJPQLFailureTest() {
-		
-		assertNull(repo.getSalaireByEmployeIdJPQL(3));
-		
-		
-	}
+
 	
 	public void getSalaireMoyenByDepartementIdTest() {
 		
@@ -113,13 +99,7 @@ public class EmployeTest {
 		
 	}
 	
-	public void getSalaireMoyenByDepartementIdFailureTest() {
-		
-		assertNull(repo.getSalaireMoyenByDepartementId(3));
-		
-		
-		
-	}
+	
 	
 	
 
