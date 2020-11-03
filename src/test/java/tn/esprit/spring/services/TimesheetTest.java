@@ -11,6 +11,9 @@ import org.springframework.test.context.junit4.SpringRunner;
 import tn.esprit.spring.entities.Departement;
 import tn.esprit.spring.entities.Employe;
 import tn.esprit.spring.entities.Mission;
+import tn.esprit.spring.entities.Contrat;
+import tn.esprit.spring.entities.Timesheet;
+
 import tn.esprit.spring.entities.Role;
 
 
