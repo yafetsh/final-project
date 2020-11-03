@@ -1,33 +1,29 @@
 package tn.esprit.spring.services;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import tn.esprit.spring.entities.Departement;
 import tn.esprit.spring.entities.Employe;
-import tn.esprit.spring.entities.Entreprise;
 import tn.esprit.spring.entities.Mission;
 import tn.esprit.spring.entities.Role;
 import tn.esprit.spring.entities.Timesheet;
 import tn.esprit.spring.entities.TimesheetPK;
 import tn.esprit.spring.repository.DepartementRepository;
 import tn.esprit.spring.repository.EmployeRepository;
-import tn.esprit.spring.repository.EntrepriseRepository;
 import tn.esprit.spring.repository.MissionRepository;
 import tn.esprit.spring.repository.TimesheetRepository;
 
 @Service
 public class TimesheetServiceImpl implements ITimesheetService {
     
-	private static Logger LOGGER = LogManager.getLogger(TimesheetServiceImpl.class);
+	private static Logger log = LogManager.getLogger(TimesheetServiceImpl.class);
 
 	
 
@@ -39,149 +35,122 @@ public class TimesheetServiceImpl implements ITimesheetService {
 	TimesheetRepository timesheetRepository;
 	@Autowired
 	EmployeRepository employeRepository;
-	@Autowired
-	EntrepriseRepository entrepriseRepository;
 	
 	
 	public int ajouterMission(Mission mission) {
-		try {
-			   LOGGER.info("in Add Mission method");
-		        LOGGER.debug("add mission going to be started");
+			log.info("in Add Mission method");
+			log.debug("add mission going to be started");
 
 
 				missionRepository.save(mission);
-		        LOGGER.debug("Mission added successfully");
-		}
-     catch (Exception e) {
-    	 LOGGER.error("Error in AddMission() : " + e);
-    	 
-     }
+				log.debug("Mission added successfully");
+		
+ 
 
 		return mission.getId();
 	}
     
 	public void affecterMissionADepartement(int missionId, int depId) {
-		try {
-			   LOGGER.info("in Affect MissionToDepartment method");
+		
+			log.info("in Affect MissionToDepartment method");
+			Optional<Mission> missionManagedEntity = missionRepository.findById(missionId);
+			log.info("Mission Found");
+			Optional<Departement> deptManagedEntity = deptRepoistory.findById(depId);
 
-			
-			Mission mission = missionRepository.findById(missionId).get();
-	        LOGGER.info("Mission Found");
+			log.info("Deparrtment Found");
+if(missionManagedEntity.isPresent() && deptManagedEntity.isPresent() ){
+	missionManagedEntity.get().setDepartement(deptManagedEntity.get());
+	log.debug("Mission affected successfully");
 
-			Departement dep = deptRepoistory.findById(depId).get();
-	        LOGGER.info("Deparrtment Found");
-
-			mission.setDepartement(dep);
-	        LOGGER.debug("Mission affected successfully");
-
-	        LOGGER.info("Going to be saved into Database");
-			missionRepository.save(mission);
-	        LOGGER.debug("Successfully saved into Database");
-
-			
-			
-		}
-		catch(Exception e) {
-	    	 LOGGER.error("Error in AffectMissionToDepartment() : " + e);
-
-			
-		}
+	log.info("Going to be saved into Database");
+	missionRepository.save(missionManagedEntity.get());
+	log.debug("Successfully saved into Database");
+}
 		
 		
 	}
 
 	public void ajouterTimesheet(int missionId, int employeId, Date dateDebut, Date dateFin) {
-		try {
-			   LOGGER.info("in AddTimesheet method");
+	
+			log.info("in AddTimesheet method");
 
 			TimesheetPK timesheetPK = new TimesheetPK();
 			timesheetPK.setDateDebut(dateDebut);
 			timesheetPK.setDateFin(dateFin);
 			timesheetPK.setIdEmploye(employeId);
 			timesheetPK.setIdMission(missionId);
-	        LOGGER.info("TimeSheetPK executed successfully");
+			log.info("TimeSheetPK executed successfully");
 
 			Timesheet timesheet = new Timesheet();
 			timesheet.setTimesheetPK(timesheetPK);
 			timesheet.setValide(false); //par defaut non valide
-	        LOGGER.debug("Passed TimesheetPK param successfully");
-	        LOGGER.info("Going to be saved into Database");
+			log.debug("Passed TimesheetPK param successfully");
+			log.info("Going to be saved into Database");
 
 			
 			timesheetRepository.save(timesheet);
-	        LOGGER.debug("Successfully saved into Database");
-
-		}
-		catch (Exception e) {
-	    	 LOGGER.error("Error in AddTimesheet() : " + e);
-
-			
-		}
+			log.debug("Successfully saved into Database");
 		
 		
 	}
 
 	
 	public void validerTimesheet(int missionId, int employeId, Date dateDebut, Date dateFin, int validateurId) {
-		try {
-			   LOGGER.info("in ValiderTimesheet method");
-			Employe validateur = employeRepository.findById(validateurId).get();
-	        LOGGER.info("Employe validateur Found");
+	
+			log.info("in ValiderTimesheet method");
+			Optional<Employe> valManagedEntity = employeRepository.findById(validateurId);
 
-			Mission mission = missionRepository.findById(missionId).get();
-	        LOGGER.info("Mission Found");
-
-			//verifier s'il est un chef de departement (interet des enum)
-			if(!validateur.getRole().equals(Role.CHEF_DEPARTEMENT)){
-		        LOGGER.debug("l'employe doit etre chef de departement pour valider une feuille de temps !");
-
-				return;
-			}
-			//verifier s'il est le chef de departement de la mission en question
-			boolean chefDeLaMission = false;
-			for(Departement dep : validateur.getDepartements()){
+			log.info("Employe validateur Found");
+			Optional<Mission> misManagedEntity = missionRepository.findById(missionId);
+			log.info("Mission Found");
+			if(valManagedEntity.isPresent() && (!valManagedEntity.get().getRole().equals(Role.CHEF_DEPARTEMENT)))
+			{
 				
-				if(dep.getId() == mission.getDepartement().getId()){
-			        LOGGER.debug("le vrai chef de departement ");
+					log.debug("l'employe doit etre chef de departement pour valider une feuille de temps !");
 
-					chefDeLaMission = true;
-					break;
+					return;
+					
+		
+			}
+			boolean chefDeLaMission = false;
+			if(valManagedEntity.isPresent() && misManagedEntity.isPresent()){
+				for(Departement dep : valManagedEntity.get().getDepartements()){
+					
+					if(dep.getId() == misManagedEntity.get().getDepartement().getId()){
+						log.debug("le vrai chef de departement ");
+
+						chefDeLaMission = true;
+						break;
+					}
 				}
 			}
+		
 			if(!chefDeLaMission){
-		        LOGGER.debug("l'employe doit etre chef de departement de la mission en question");
+				log.debug("l'employe doit etre chef de departement de la mission en question");
 
-				//System.out.println("l'employe doit etre chef de departement de la mission en question");
 				return;
 			}
 			
 			TimesheetPK timesheetPK = new TimesheetPK(missionId, employeId, dateDebut, dateFin);
 
 			Timesheet timesheet =timesheetRepository.findBytimesheetPK(timesheetPK);
-	        LOGGER.debug("timesheet found by timesheetpk");
+			log.debug("timesheet found by timesheetpk");
 
 			timesheet.setValide(true);
-	        LOGGER.debug("successfully validated");
+			log.debug("successfully validated");
 
-			//Comment Lire une date de la base de données
-			SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-			System.out.println("dateDebut : " + dateFormat.format(timesheet.getTimesheetPK().getDateDebut()));
-	        LOGGER.debug("dateDebut : " + dateFormat.format(timesheet.getTimesheetPK().getDateDebut()));
+			//Comment Lire une date de la base de donnÃ©es
 
 			
-		} catch (Exception e) {
-	    	 LOGGER.error("Error in ValidateTimesheet() : " + e);
 
-			
-		}
 	
 		
 	}
 
 	
 	public List<Mission> findAllMissionByEmployeJPQL(int employeId) {
-		   LOGGER.info("In findAllMissionByEmployeJPQL method");
-	        LOGGER.debug("findAllMissionByEmployeJPQL Started! ");
+		log.info("In findAllMissionByEmployeJPQL method");
+		log.debug("findAllMissionByEmployeJPQL Started! ");
 
 
 		return timesheetRepository.findAllMissionByEmployeJPQL(employeId);
@@ -189,83 +158,10 @@ public class TimesheetServiceImpl implements ITimesheetService {
 
 	
 	public List<Employe> getAllEmployeByMission(int missionId) {
-		   LOGGER.info("In getAllEmployeByMission method");
-	        LOGGER.debug("getAllEmployeByMission Started! ");
+		log.info("In getAllEmployeByMission method");
+		log.debug("getAllEmployeByMission Started! ");
 		return timesheetRepository.getAllEmployeByMission(missionId);
 	}
-	/////////logs for employe
-	
-	public int ajouterEmploye(Employe employe) {
-		try {
-			   LOGGER.info("add employe method");
-		        LOGGER.debug("An emplyoe is going to be added");
-
-
-				employeRepository.save(employe);
-		        LOGGER.debug("Employe  added successfully");
-		}
-     catch (Exception e) {
-    	 LOGGER.error("Error in AddMission() : " + e);
-    	 
-     }
-
-		return employe.getId();
-	}
-	
-	
-
-
-
-public int countemp() {
-	   LOGGER.info("count employes method");
-     LOGGER.debug("method count employe started ");
-
-
-	return employeRepository.countemp();
-}
-
-public List<String> employeNames(){
-	
-	   LOGGER.info("method to get all employe names ");
-	     LOGGER.debug("method employeNames started ");
-
-
-		return employeRepository.employeNames();
-	
-	
-}
-
-
-public List<Employe> getAllEmployeByEntreprisec( Entreprise entreprise){
-	   LOGGER.info("getAllEmployeByEntreprisec");
-       LOGGER.debug("getAllEmployeByEntreprisec Started! ");
-	return employeRepository.getAllEmployeByEntreprisec( entreprise);
-
-
-}
-public float getSalaireByEmployeIdJPQL (int employeId) {
-	LOGGER.info("getAllEmployeByEntreprisec");
-    LOGGER.debug("getAllEmployeByEntreprisec Started! ");
-	return employeRepository.getSalaireByEmployeIdJPQL( employeId);
-	
-	
-	
-}
-
-
-public Double getSalaireMoyenByDepartementId(int departementId) {
-	LOGGER.info("getAllEmployeByEntreprisec");
-    LOGGER.debug("getAllEmployeByEntreprisec Started! ");
-	return employeRepository.getSalaireMoyenByDepartementId( departementId);
-	
-	
-}
-
-
-
-
-
-
 
 }
 
