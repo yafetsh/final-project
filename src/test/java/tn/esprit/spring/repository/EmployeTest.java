@@ -14,6 +14,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.core.annotation.Order;
 import org.springframework.test.annotation.DirtiesContext;
@@ -27,6 +28,7 @@ import tn.esprit.spring.entities.Entreprise;
 import tn.esprit.spring.entities.Role;
 import tn.esprit.spring.entities.Timesheet;
 import tn.esprit.spring.entities.TimesheetPK;
+import tn.esprit.spring.services.IEmployeService;
 import tn.esprit.spring.services.TimesheetServiceImpl;
 
 import org.junit.Test;
@@ -34,45 +36,35 @@ import org.junit.Test;
 
 
 @RunWith(SpringRunner.class)
-@DataJpaTest
-@AutoConfigureTestDatabase(replace = Replace.NONE)
-//@ComponentScan({"tn.esprit.spring.services"})
+@SpringBootTest
 
 public class EmployeTest {
 	private static Logger LOGGER = LogManager.getLogger(TimesheetServiceImpl.class);
 	
 	@Autowired
-	private EmployeRepository repo;
-	private TimesheetServiceImpl service;
-	@Autowired
-	private TestEntityManager entityManager;
+	IEmployeService employeService;
 	Employe employe = new Employe("test","test","test",true,Role.ADMINISTRATEUR);
 	//Entreprise entreprise = new Entreprise ();
 	
+	@Test
+	public void ajouterEmployeTest() {
+		int empId = employeService.ajouterEmploye(employe);
+		assertEquals(employe.getId(), empId);	
+	}
 	
-	public void employeNamesTest() {
-        LOGGER.debug("getting employes names");
+	@Test
+	public void getAllEmployes() {
 
-		assertNotNull(repo.employeNames());
+		assertNotNull(employeService.getAllEmployes());
 	
 	}
 	
-	public void employeNamesFailureTest() {
-        LOGGER.debug("getting employes names failed");
-
-		assertNotNull(repo.employeNames());
-	
-	}
-	
-	
-	
-	
+	/*@Test
 	public void countempTest() {
-        LOGGER.debug("counting employes in database ");
 
 		assertNotNull(repo.countemp());
 	
-	}
+	}*/
 	
 	//public void getAllEmployeByEntreprisecTest() {
 		//entityManager.persist(entreprise);
@@ -80,24 +72,25 @@ public class EmployeTest {
 		
 	//}
 	
+	//@Test
 	
-	public void getSalaireByEmployeIdJPQLTest() {
+	//public void getSalaireByEmployeIdJPQLTest() {
 		
-		assertNotNull(repo.getSalaireByEmployeIdJPQL(3));
+		//assertNotNull(repo.getSalaireByEmployeIdJPQL(3));
 		
 		
-	}
+	//}
 	
-	
+	//
 
 	
-	public void getSalaireMoyenByDepartementIdTest() {
+	//public void getSalaireMoyenByDepartementIdTest() {
 		
-		assertNotNull(repo.getSalaireMoyenByDepartementId(3));
+		//assertNotNull(repo.getSalaireMoyenByDepartementId(3));
 		
 		
 		
-	}
+	//}
 	
 	
 	
