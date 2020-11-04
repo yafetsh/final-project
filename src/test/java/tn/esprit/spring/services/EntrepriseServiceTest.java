@@ -57,11 +57,18 @@ public void affecterDepartementAEntrepriseTest()
 @Test
 public void getAllDepartementsNamesByEntrepriseTest()
 {
-	List<String> listDeparts = ies.getAllDepartementsNamesByEntreprise(5); 
+	Entreprise e = new Entreprise("Entreprise", "Entreprise"); 
+	Departement d = new Departement("Departement"); 
+	int er = ies.ajouterEntreprise(e); 
+	e.setId(er);
+	d.setEntreprise(e);
+	int dr = ies.ajouterDepartement(d); 
+  	ies.affecterDepartementAEntreprise(dr,er); 
+    
+	List<String> listDeparts = ies.getAllDepartementsNamesByEntreprise(er); 
 	assertEquals(1, listDeparts.size());
 	
 }
-
 
 @Test
 public void getEntrepriseByIdTest()
