@@ -50,7 +50,8 @@ public void affecterDepartementAEntrepriseTest()
 
 	int dr = ies.ajouterDepartement(d); 
 
-    ies.affecterDepartementAEntreprise(dr,er); 
+  	 ies.affecterDepartementAEntreprise(dr,er); 
+
 	assertEquals(e.getId(), d.getEntreprise().getId());
 }
 
