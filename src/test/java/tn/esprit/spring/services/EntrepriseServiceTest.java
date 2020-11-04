@@ -46,7 +46,8 @@ public void affecterDepartementAEntrepriseTest()
 	Departement d = new Departement("Departement2"); 
 	int er = ies.ajouterEntreprise(e); 
 	e.setId(er);
-	d.setEntreprise(e);
+		d.setEntreprise(e);
+
 
 	int dr = ies.ajouterDepartement(d); 
 
